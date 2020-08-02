@@ -4,8 +4,22 @@
 CREATE UNIQUE INDEX profiles_email_idx ON profiles(email);
 CREATE UNIQUE INDEX profiles_phone_idx ON profiles(phone);
 
+-- profile_settings
+CREATE INDEX profile_settings_offer_by_sms_idx ON profile_settings(offer_by_sms);
+CREATE INDEX profile_settings_offer_by_email_idx ON profile_settings(offer_by_email);
+CREATE INDEX profile_settings_offer_by_push_idx ON profile_settings(offer_by_push);
+CREATE INDEX profile_settings_myivi_by_sms_idx ON profile_settings(myivi_by_sms);
+CREATE INDEX profile_settings_myivi_by_email_idx ON profile_settings(myivi_by_email);
+CREATE INDEX profile_settings_myivi_by_push_idx ON profile_settings(myivi_by_push);
+CREATE INDEX profile_settings_newitems_by_sms_idx ON profile_settings(newitems_by_sms);
+CREATE INDEX profile_settings_newitems_by_email_idx ON profile_settings(newitems_by_email);
+CREATE INDEX profile_settings_newitems_by_push_idx ON profile_settings(newitems_by_push);
+CREATE INDEX profile_settings_news_by_email_idx ON profile_settings(news_by_email);
+CREATE INDEX profile_settings_news_by_push_idx ON profile_settings(news_by_push);
+
 -- profile_subscriptions
 CREATE INDEX profile_subscriptions_profile_id_idx ON profile_subscriptions(profile_id);
+CREATE INDEX profile_subscriptions_status_idx ON profile_subscriptions(status);
 
 -- profile_purchases
 CREATE INDEX profile_purchases_profile_id_idx ON profile_purchases(profile_id);
