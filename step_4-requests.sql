@@ -1,4 +1,4 @@
--- список email пользователей, у которых разрешена отправка предложений от ivi.ru
+п»ї-- СЃРїРёСЃРѕРє email РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№, Сѓ РєРѕС‚РѕСЂС‹С… СЂР°Р·СЂРµС€РµРЅР° РѕС‚РїСЂР°РІРєР° РїСЂРµРґР»РѕР¶РµРЅРёР№ РѕС‚ ivi.ru
 -- EXPLAIN SELECT
 SELECT
 	email
@@ -9,7 +9,7 @@ JOIN profile_settings ON
 WHERE
 	profile_settings.offer_by_email = 1;
 
--- список email пользователей, у которых разрешена отправка предложений от ivi.ru и имеется приостановленная подписка
+-- СЃРїРёСЃРѕРє email РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№, Сѓ РєРѕС‚РѕСЂС‹С… СЂР°Р·СЂРµС€РµРЅР° РѕС‚РїСЂР°РІРєР° РїСЂРµРґР»РѕР¶РµРЅРёР№ РѕС‚ ivi.ru Рё РёРјРµРµС‚СЃСЏ РїСЂРёРѕСЃС‚Р°РЅРѕРІР»РµРЅРЅР°СЏ РїРѕРґРїРёСЃРєР°
 -- EXPLAIN SELECT
 SELECT
 	email
@@ -23,7 +23,7 @@ WHERE
 	profile_settings.offer_by_email = 1 AND profile_subscriptions.status = 'suspended';
 
 
--- список пользователей, отсортированный по количеству сделанных покупок в обратном порядке (ограничен до 100 пользователей)
+-- СЃРїРёСЃРѕРє РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№, РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ СЃРґРµР»Р°РЅРЅС‹С… РїРѕРєСѓРїРѕРє РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ (РѕРіСЂР°РЅРёС‡РµРЅ РґРѕ 100 РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№)
 -- EXPLAIN SELECT
 SELECT
 	profiles.id,
@@ -40,12 +40,13 @@ ORDER BY
 LIMIT 100;
 
 
--- тоже самое, только через WINDOW
+-- С‚РѕР¶Рµ СЃР°РјРѕРµ, С‚РѕР»СЊРєРѕ С‡РµСЂРµР· WINDOW + РїРѕРґСЃС‡РµС‚ РєРѕР»РёС‡РµСЃС‚РІР° РїСЂРёРІСЏР·Р°РЅРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ Рє РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ
 -- EXPLAIN SELECT DISTINCT
 SELECT DISTINCT
 	profiles.id,
 	CONCAT(profiles.first_name, ' ', profiles.last_name) AS name,
-	COUNT(media.id) OVER w AS total_purchases
+	COUNT(profile_purchases.media_id) OVER w AS total_purchases,
+	(SELECT COUNT(*) FROM profile_devices WHERE profile_devices.profile_id = profiles.id) AS total_devices
 FROM
 	profiles
 LEFT JOIN profile_purchases ON
@@ -57,3 +58,38 @@ ORDER BY
 	total_purchases DESC, name
 LIMIT 100;
 
+
+-- Р°РЅР°Р»РёС‚РёРєР° РїРѕ РјРµРґРёР°С„Р°Р№Р»Р°Рј РІ СЂР°Р·СЂРµР·Рµ РєР°С‡РµСЃС‚РІР° Рё Р·Р°РЅРёРјР°РµРјРѕРіРѕ РёРјРё РґРёСЃРєРѕРІРѕРіРѕ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР°
+SELECT DISTINCT
+	bitrate,
+	COUNT(id) OVER w AS files_amount,
+	AVG(`size`) OVER w AS average_size,
+	SUM(`size`) OVER w AS total_size,
+	CONCAT(ROUND(COUNT(id) OVER w / COUNT(id) OVER() * 100, 0),"%") AS "%"
+FROM
+	media_files
+WINDOW w AS (PARTITION BY bitrate);
+
+
+-- Р°РЅР°Р»РёС‚РёРєР° РїРѕ РјРµРґРёР°С„Р°Р№Р»Р°Рј РІ СЂР°Р·СЂРµР·Рµ С‚РёРїР° РјРµРґРёР°С„Р°Р№Р»Р° Рё Р·Р°РЅРёРјР°РµРјРѕРіРѕ РёРјРё РґРёСЃРєРѕРІРѕРіРѕ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР°
+SELECT DISTINCT
+	media_type,
+	COUNT(media.id) OVER w AS files_amount,
+	SUM(media_files.size) OVER w AS total_size,
+	CONCAT(ROUND(COUNT(media.id) OVER w / COUNT(media_files.id) OVER() * 100, 0),"%") AS "%"
+FROM
+	media
+JOIN media_files ON
+	media_files.id = media.media_files_id
+WINDOW w AS (PARTITION BY media_type)
+ORDER BY files_amount DESC;
+
+
+-- Р°РЅР°Р»РёС‚РёРєР° РїРѕ Р¶Р°РЅСЂР°Рј РјРµРґРёР°С„Р°Р№Р»РѕРІ
+SELECT DISTINCT
+	genre,
+	COUNT(id) OVER w AS files_amount,
+	CONCAT(ROUND(COUNT(id) OVER w / COUNT(id) OVER() * 100, 0),"%") AS "%"
+FROM
+	media_genres
+WINDOW w AS (PARTITION BY genre);
