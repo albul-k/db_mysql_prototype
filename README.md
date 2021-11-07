@@ -1,22 +1,33 @@
 # db_mysql_prototype
 
-## Курсовая работа по MySQL: прототип БД сервиса ivi.ru
+Prototype of [ivi.ru](https://www.ivi.ru/)  MySQL DB.
 
-## Список таблиц
+## Tables
 
-* profiles - "Профиль пользователя"
-* profile_settings - "Настройки пользователя"
-* profile_subscriptions - "Подписки пользователя"
-* profile_purchases "Покупки пользователя"
-* profile_devices - "Устройства привязанные к профилю"
-* profile_views_list - "Таблица просмотренных видео/ желаемых просмотреть"
-* media - "Сведения о медиафайле"
-* media_files - "Таблица медиафайлов"
-* media_feedbacks - "Отзывы/рецензии"
-* media_languages - "Список языков озвучки"
-* media_hashtags - "Список жанров медифайла"
-* media_genres - "Список жанров медифайла"
-* likes - "Оценки отзывов/рецензий"
+* profiles
+* profile_settings
+* profile_subscriptions
+* profile_purchases
+* profile_devices
+* profile_views_list
+* media
+* media_files
+* media_feedbacks
+* media_languages
+* media_hashtags
+* media_genres
+* likes
 
-Для проверки запросов к БД, необходимо восстановить дамп из файла step_3-5-dump-ivi_db-202008031104.sql
-Запросы находятся в файле step_4-requests.sql
+## DB Schema
+
+![DB schema](step_3-4-db_diagram.png)
+
+## How to restore DB
+
+Restore dump from `step_3-5-dump-ivi_db-202008031104.sql`
+
+```bash
+mysql -u [user] -p ivi_db < step_3-5-dump-ivi_db-202008031104.sql
+```
+
+Test queries are located in `step_4-requests.sql`
